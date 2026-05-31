@@ -3,27 +3,36 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Nexus Dispatch — Command Intelligence Platform" },
+      {
+        name: "description",
+        content:
+          "Nexus Dispatch: real-time fleet command, route intelligence, and dispatch analytics in a single mission-control workspace.",
+      },
+      { property: "og:title", content: "Nexus Dispatch — Command Intelligence Platform" },
+      {
+        property: "og:description",
+        content:
+          "Real-time fleet command, route intelligence, and dispatch analytics in a single mission-control workspace.",
+      },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <iframe
+      src="/dispatch.html"
+      title="Nexus Dispatch"
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100vw",
+        height: "100vh",
+        border: 0,
+        background: "#04060a",
+      }}
+    />
   );
 }
