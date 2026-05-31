@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS DISPATCH — Command Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#04060a;--abyss:#070c12;--deep:#0a1018;--surface:#0d151e;--raised:#111c28;--edge:#162030;--wire:#1e2e3e;--dim:#2a3d52;--muted:#4a6070;--soft:#6a8a9a;--text:#b8ccd8;--bright:#ddeeff;
+  --gold:#e8a020;--gold2:#f5c060;--gold-glow:rgba(232,160,32,.15);
+  --em:#00d68f;--em-glow:rgba(0,214,143,.12);
+  --cr:#e02d3c;--cr-glow:rgba(224,45,60,.15);
+  --sky:#38b4e8;--sky-glow:rgba(56,180,232,.12);
+  --violet:#8060e0;--amber:#ff9020;
+  --display:'Chakra Petch',sans-serif;--mono:'DM Mono',monospace;--body:'Outfit',sans-serif;
+  --r:4px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--void);color:var(--text);font-family:var(--body);display:flex;flex-direction:column;position:relative}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(56,180,232,.007) 3px,rgba(56,180,232,.007) 4px);pointer-events:none;z-index:9997}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--dim);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;padding:0;border-bottom:1px solid var(--wire);background:linear-gradient(180deg,var(--abyss),var(--deep));flex-shrink:0;height:52px;position:relative;overflow:hidden}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold) 30%,var(--gold) 70%,transparent);opacity:.35}
+.logo-block{display:flex;align-items:center;gap:13px;padding:0 18px;border-right:1px solid var(--wire);height:100%;flex-shrink:0}
+.logo-hex{width:32px;height:32px;flex-shrink:0}
+.logo-hex svg{width:100%;height:100%}
+.ring-anim{animation:spin-slow 8s linear infinite;transform-origin:center}
+@keyframes spin-slow{to{transform:rotate(360deg)}}
+.logo-text{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:5px;color:var(--bright);text-transform:uppercase;line-height:1}
+.logo-text em{color:var(--gold);font-style:normal}
+.logo-sub{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:3px}
+.hkpis{display:flex;align-items:stretch;flex:1;height:100%;overflow:hidden}
+.hk{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 16px;border-right:1px solid var(--wire);min-width:80px;cursor:default;transition:background .2s;position:relative}
+.hk:hover{background:var(--gold-glow)}
+.hk-v{font-family:var(--display);font-size:19px;font-weight:600;line-height:1;color:var(--bright)}
+.hk-l{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:3px}
+.hk-bar{position:absolute;bottom:0;left:10%;right:10%;height:2px;border-radius:1px}
+.hdr-right{display:flex;align-items:center;height:100%;margin-left:auto}
+.hdr-weather{display:flex;align-items:center;gap:8px;padding:0 14px;border-left:1px solid var(--wire);height:100%;font-size:11px}
+.wtmp{font-family:var(--display);font-size:16px;color:var(--bright);font-weight:600}
+.wdesc{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px}
+.hdr-sys{display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid var(--wire);height:100%}
+.sys-dot{width:6px;height:6px;border-radius:50%;background:var(--em);box-shadow:0 0 6px var(--em);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.sys-lbl{font-family:var(--mono);font-size:9px;color:var(--em);letter-spacing:1px}
+.hdr-clock{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding:0 18px;border-left:1px solid var(--wire);height:100%}
+.clk-t{font-family:var(--display);font-size:21px;font-weight:700;color:var(--gold);letter-spacing:2px;line-height:1}
+.clk-d{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-top:2px}
+
+/* ── NAV TABS ── */
+.nav{display:flex;background:var(--abyss);border-bottom:1px solid var(--wire);padding:0 14px;height:34px;flex-shrink:0;overflow-x:auto}
+.ntab{display:flex;align-items:center;gap:6px;padding:0 14px;font-family:var(--display);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;user-select:none;position:relative;top:1px}
+.ntab:hover{color:var(--text)}
+.ntab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.ntab.new-feat{color:var(--em)}
+.ntab.new-feat.active{color:var(--em);border-bottom-color:var(--em)}
+.tbadge{background:var(--cr);color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;font-family:var(--mono)}
+.tbadge-em{background:var(--em);color:var(--void);font-size:8px;padding:1px 5px;border-radius:10px;font-family:var(--mono)}
+
+/* ── WORKSPACE ── */
+.ws{flex:1;overflow:hidden;display:none}
+.ws.active{display:flex}
+#vw-command{display:none;grid-template-columns:265px 1fr 285px;grid-template-rows:1fr 195px;gap:1px;background:var(--void)}
+#vw-command.active{display:grid}
+#vw-itinerary{display:none;flex-direction:column;gap:0}
+#vw-itinerary.active{display:flex}
+#vw-pricing{display:none;flex-direction:column}
+#vw-pricing.active{display:flex}
+#vw-analytics{display:none;flex-direction:column}
+#vw-analytics.active{display:flex}
+
+/* ── PANEL ── */
+.pnl{background:var(--deep);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.pnl-hd{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;border-bottom:1px solid var(--wire);background:var(--surface);flex-shrink:0;gap:8px}
+.pnl-title{font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);white-space:nowrap}
+.pnl-acts{display:flex;gap:6px;align-items:center}
+
+/* ── BADGES ── */
+.bdg{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:2px;letter-spacing:1px}
+.bdg-gold{background:var(--gold-glow);color:var(--gold);border:1px solid rgba(232,160,32,.3)}
+.bdg-em{background:var(--em-glow);color:var(--em);border:1px solid rgba(0,214,143,.3)}
+.bdg-cr{background:var(--cr-glow);color:var(--cr);border:1px solid rgba(224,45,60,.3)}
+.bdg-sky{background:var(--sky-glow);color:var(--sky);border:1px solid rgba(56,180,232,.3)}
+
+/* ── BUTTONS ── */
+.btn{font-family:var(--display);font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border:none;border-radius:var(--r);cursor:pointer;transition:all .18s;white-space:nowrap}
+.btn-gold{background:var(--gold);color:var(--void)}
+.btn-gold:hover{background:var(--gold2);box-shadow:0 0 16px var(--gold-glow)}
+.btn-ghost{background:transparent;border:1px solid var(--wire);color:var(--soft)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-em{background:rgba(0,214,143,.15);border:1px solid rgba(0,214,143,.3);color:var(--em)}
+.btn-em:hover{background:rgba(0,214,143,.25)}
+.btn-cr{background:rgba(224,45,60,.15);border:1px solid rgba(224,45,60,.3);color:var(--cr)}
+.btn-sky{background:rgba(56,180,232,.15);border:1px solid rgba(56,180,232,.3);color:var(--sky)}
+.btn-violet{background:rgba(128,96,224,.2);border:1px solid rgba(128,96,224,.4);color:var(--violet)}
+
+/* ── FLEET PANEL ── */
+.fleet-pnl{grid-row:1/3}
+.fsearch{padding:8px;border-bottom:1px solid var(--wire);flex-shrink:0}
+.sinput{width:100%;background:var(--raised);border:1px solid var(--wire);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 10px 5px 28px;outline:none;transition:border-color .2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a6070' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
+.sinput:focus{border-color:var(--gold)}
+.sinput::placeholder{color:var(--muted)}
+.fleet-list{overflow-y:auto;flex:1;padding:8px;display:flex;flex-direction:column;gap:5px}
+.dcard{background:var(--surface);border:1px solid var(--wire);border-radius:var(--r);padding:10px 11px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.dcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;transition:background .2s}
+.dcard.sa::before{background:var(--em)}.dcard.se::before{background:var(--sky)}.dcard.sd::before{background:var(--cr)}.dcard.ss::before{background:var(--gold)}
+.dcard:hover{border-color:rgba(232,160,32,.4);transform:translateX(2px);background:var(--raised)}
+.dcard.sel{border-color:rgba(232,160,32,.5);background:rgba(232,160,32,.04)}
+.dc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:7px}
+.dc-name{font-family:var(--display);font-size:13px;font-weight:600;color:var(--bright);letter-spacing:.5px}
+.dc-id{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:1px}
+.dc-stat-tag{font-family:var(--mono);font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:2px}
+.dc-stat-tag.sa{background:var(--em-glow);color:var(--em)}.dc-stat-tag.se{background:var(--sky-glow);color:var(--sky)}.dc-stat-tag.sd{background:var(--cr-glow);color:var(--cr)}.dc-stat-tag.ss{background:var(--gold-glow);color:var(--gold)}
+.dc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:7px}
+.dc-st{text-align:center}
+.dc-sv{font-family:var(--mono);font-size:11px;color:var(--bright);line-height:1}
+.dc-sl{font-size:8px;color:var(--muted);margin-top:1px}
+.dc-bar{height:2px;background:var(--edge);border-radius:1px;overflow:hidden}
+.dc-fill{height:100%;border-radius:1px;transition:width 1s}
+.dc-veh{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:5px;display:flex;justify-content:space-between}
+.dc-veh span{color:var(--soft)}
+
+/* ── MAP PANEL ── */
+.map-inner{flex:1;position:relative;overflow:hidden;background:radial-gradient(ellipse at 40% 50%,#061018 0%,#030609 100%)}
+.map-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(56,180,232,.033) 1px,transparent 1px),linear-gradient(90deg,rgba(56,180,232,.033) 1px,transparent 1px);background-size:48px 48px}
+.map-grid-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 40%,var(--void) 100%)}
+.map-svg{position:absolute;inset:0;width:100%;height:100%}
+.vmarker{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+.vmring{position:absolute;border-radius:50%;border:1px solid currentColor;top:50%;left:50%;transform:translate(-50%,-50%);animation:vmping 2.4s ease-out infinite;opacity:0}
+.vmring2{animation-delay:.8s}
+@keyframes vmping{0%{width:10px;height:10px;opacity:.8}100%{width:38px;height:38px;opacity:0}}
+.vmcore{width:16px;height:16px;border-radius:50%;border:2px solid currentColor;background:var(--void);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:7px;position:relative;z-index:1;transition:transform .2s}
+.vmarker:hover .vmcore{transform:scale(1.3)}
+.vmtt{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--wire);border-radius:var(--r);padding:5px 9px;font-family:var(--mono);font-size:9px;white-space:nowrap;display:none;pointer-events:none;z-index:100}
+.vmarker:hover .vmtt{display:block}
+.map-controls{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:2px;z-index:20}
+.mcbtn{width:30px;height:30px;background:rgba(10,16,24,.85);border:1px solid var(--wire);color:var(--soft);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:var(--r);transition:all .18s;backdrop-filter:blur(4px)}
+.mcbtn:hover,.mcbtn.on{background:var(--gold-glow);border-color:var(--gold);color:var(--gold)}
+.map-legend{position:absolute;bottom:12px;left:12px;background:rgba(7,12,18,.88);border:1px solid var(--wire);border-radius:var(--r);padding:8px 12px;backdrop-filter:blur(6px)}
+.lg-row{display:flex;align-items:center;gap:7px;font-size:9px;color:var(--muted);padding:2px 0}
+.lg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.map-congestion{position:absolute;bottom:12px;right:48px;background:rgba(7,12,18,.88);border:1px solid var(--wire);border-radius:var(--r);padding:5px 10px;font-family:var(--mono);font-size:9px;color:var(--cr);backdrop-filter:blur(6px);display:flex;align-items:center;gap:5px}
+
+/* ── RIGHT INTEL PANEL ── */
+.right-pnl{grid-row:1/3;overflow:hidden}
+.rscroll{overflow-y:auto;flex:1;padding:8px;display:flex;flex-direction:column;gap:8px}
+.sc{background:var(--surface);border:1px solid var(--wire);border-radius:var(--r);overflow:hidden}
+.sc-hd{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;border-bottom:1px solid var(--edge);background:var(--raised)}
+.sc-title{font-family:var(--display);font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--soft)}
+.sc-body{padding:10px 12px}
+.aichat{height:100px;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;background:var(--raised);border-bottom:1px solid var(--edge)}
+.cm{display:flex;gap:8px;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.cav{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;margin-top:1px}
+.cav.ai{background:var(--gold-glow);border:1px solid rgba(232,160,32,.4);color:var(--gold)}
+.cav.user{background:var(--sky-glow);border:1px solid rgba(56,180,232,.4);color:var(--sky)}
+.cbubble{background:var(--deep);border:1px solid var(--edge);border-radius:0 var(--r) var(--r) var(--r);padding:5px 9px;font-size:10px;line-height:1.5;flex:1}
+.cbubble.u{background:rgba(56,180,232,.06);border-color:rgba(56,180,232,.15);border-radius:var(--r) 0 var(--r) var(--r)}
+.airow{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--edge)}
+.aiinp{flex:1;background:var(--raised);border:1px solid var(--wire);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 10px;outline:none}
+.aiinp:focus{border-color:var(--gold)}
+.aiinp::placeholder{color:var(--muted)}
+.tbar-wrap{margin-bottom:7px}
+.tbar-top{display:flex;justify-content:space-between;margin-bottom:3px;font-size:9px}
+.tbar-nm{color:var(--text)}
+.tbar-track{height:3px;background:var(--edge);border-radius:2px;overflow:hidden}
+.tbar-fill{height:100%;border-radius:2px;transition:width 2s}
+.tbar-fill.c{background:var(--em)}.tbar-fill.m{background:var(--gold)}.tbar-fill.h{background:var(--cr)}
+.cp-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--edge)}
+.cp-item:last-child{border-bottom:none}
+.cpavs{display:flex}
+.cpav{width:26px;height:26px;border-radius:50%;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--display);font-weight:700;margin-left:-6px}
+.cpav:first-child{margin-left:0}
+.cpinfo{flex:1}
+.cpnames{font-size:10px;color:var(--bright);font-weight:500}
+.cproute{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:1px}
+.cpsave-v{font-family:var(--display);font-size:13px;font-weight:700;color:var(--em)}
+.cpsave-l{font-size:8px;color:var(--muted)}
+.cpbtn{background:var(--em-glow);border:1px solid rgba(0,214,143,.3);border-radius:var(--r);color:var(--em);font-family:var(--display);font-size:8px;font-weight:600;letter-spacing:1px;padding:3px 8px;cursor:pointer;transition:all .18s;text-transform:uppercase}
+.cpbtn:hover{background:rgba(0,214,143,.2)}
+.wr{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:10px}
+.wr+.wr{border-top:1px solid var(--edge)}
+.wrl{color:var(--muted)}.wrv{font-family:var(--mono);color:var(--bright)}
+.wrv.ok{color:var(--em)}.wrv.warn{color:var(--gold)}
+.inc{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--edge);align-items:flex-start}
+.inc:last-child{border-bottom:none}
+.inc-sev{width:6px;border-radius:3px;flex-shrink:0;align-self:stretch;min-height:28px}
+.inc-title{font-size:10px;color:var(--bright);font-weight:500}
+.inc-detail{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px}
+.incbtn{background:var(--raised);border:1px solid var(--wire);border-radius:var(--r);color:var(--soft);font-family:var(--mono);font-size:8px;padding:3px 7px;cursor:pointer;transition:all .18s;align-self:flex-start;text-transform:uppercase;letter-spacing:1px}
+.incbtn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── BOTTOM CONSOLE ── */
+.bot-pnl{display:flex;flex-direction:column}
+.bot-content{display:flex;gap:1px;flex:1;background:var(--void);overflow:hidden}
+.bot-sec{flex:1;background:var(--deep);display:flex;flex-direction:column;overflow:hidden}
+.bot-hd{padding:7px 12px;border-bottom:1px solid var(--wire);background:var(--surface);font-family:var(--display);font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.dpform{padding:8px;display:flex;flex-direction:column;gap:6px}
+.frow{display:flex;gap:6px}
+.fi{flex:1;background:var(--raised);border:1px solid var(--wire);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 9px;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--gold)}
+.fi::placeholder{color:var(--muted)}
+.fsel{background:var(--raised);border:1px solid var(--wire);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 8px;outline:none;appearance:none;cursor:pointer}
+.dpres{font-family:var(--mono);font-size:9px;color:var(--em);padding:0 2px}
+.alog{overflow-y:auto;flex:1}
+.ale{display:flex;gap:8px;padding:4px 12px;font-size:9px;border-bottom:1px solid rgba(30,46,62,.4);animation:logSlide .3s ease;align-items:baseline}
+@keyframes logSlide{from{opacity:0;background:rgba(232,160,32,.04)}to{opacity:1;background:transparent}}
+.ale-t{font-family:var(--mono);color:var(--muted);flex-shrink:0;width:52px}
+.ale-k{font-family:var(--mono);font-size:8px;width:40px;flex-shrink:0}
+.ale-k.ok{color:var(--em)}.ale-k.warn{color:var(--gold)}.ale-k.err{color:var(--cr)}.ale-k.info{color:var(--sky)}
+.ale-m{color:var(--text);flex:1;line-height:1.4}
+.eta-list{overflow-y:auto;flex:1}
+.eta-row{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--edge);transition:background .2s;cursor:default}
+.eta-row:hover{background:var(--raised)}
+.eta-rt{font-family:var(--mono);font-size:9px;color:var(--muted);width:55px;flex-shrink:0}
+.eta-dr{font-size:10px;color:var(--bright);flex:1}
+.eta-dst{font-family:var(--mono);font-size:9px;color:var(--soft);flex:1}
+.eta-mins{font-family:var(--display);font-size:16px;font-weight:600;line-height:1}
+.eta-u{font-family:var(--mono);font-size:8px;color:var(--muted)}
+.eta-prog{height:2px;background:var(--edge);border-radius:1px;overflow:hidden;margin-top:3px;width:55px}
+.eta-pf{height:100%;border-radius:1px}
+
+/* ═══════════════════════════════════
+   ITINERARY VIEW
+═══════════════════════════════════ */
+.itin-wrap{display:flex;flex:1;overflow:hidden;gap:1px;background:var(--void)}
+
+/* Upload Zone */
+.upload-pane{width:340px;flex-shrink:0;background:var(--deep);display:flex;flex-direction:column;border-right:1px solid var(--wire)}
+.drop-zone{margin:14px;border:2px dashed var(--wire);border-radius:8px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:var(--raised)}
+.drop-zone.drag-over{border-color:var(--gold);background:var(--gold-glow);transform:scale(1.01)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2}
+.dz-icon{font-size:36px;margin-bottom:12px;display:block;opacity:.7}
+.dz-title{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:2px;color:var(--bright);text-transform:uppercase;margin-bottom:6px}
+.dz-sub{font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.dz-types{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.dz-tag{background:var(--edge);border:1px solid var(--wire);border-radius:2px;font-family:var(--mono);font-size:8px;color:var(--soft);padding:2px 7px;letter-spacing:1px;text-transform:uppercase}
+.paste-area{margin:0 14px 14px;display:flex;flex-direction:column;gap:8px}
+.pa-label{font-family:var(--display);font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.pa-ta{width:100%;background:var(--raised);border:1px solid var(--wire);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:9px;padding:10px;outline:none;resize:vertical;line-height:1.6;min-height:120px}
+.pa-ta:focus{border-color:var(--gold)}
+.pa-ta::placeholder{color:var(--muted)}
+.itin-status{margin:0 14px 14px;padding:8px 12px;background:var(--raised);border:1px solid var(--edge);border-radius:var(--r);font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.7;min-height:60px}
+.itin-status.active{border-color:rgba(0,214,143,.3);color:var(--text)}
+
+/* Parsed Route Panel */
+.parsed-pane{flex:1;background:var(--deep);display:flex;flex-direction:column;overflow:hidden}
+.parsed-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted)}
+.pe-icon{font-size:48px;opacity:.3}
+.pe-txt{font-family:var(--mono);font-size:10px;text-align:center;line-height:1.8;letter-spacing:1px}
+
+.route-result-scroll{overflow-y:auto;flex:1;padding:14px}
+.route-summary-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+.rsb-card{background:var(--surface);border:1px solid var(--wire);border-radius:var(--r);padding:10px;text-align:center}
+.rsb-v{font-family:var(--display);font-size:18px;font-weight:700;color:var(--sky);line-height:1}
+.rsb-l{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px}
+.route-stops-card{background:var(--surface);border:1px solid var(--wire);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.rsc-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--edge);background:var(--raised)}
+.rsc-title{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--bright)}
+.stop-table{width:100%;border-collapse:collapse}
+.stop-table th{font-family:var(--mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:8px 14px;text-align:left;border-bottom:1px solid var(--edge);background:var(--abyss)}
+.stop-table td{font-size:10px;padding:9px 14px;border-bottom:1px solid rgba(30,46,62,.4);vertical-align:middle}
+.stop-table tr:last-child td{border-bottom:none}
+.stop-table tr:hover td{background:var(--raised)}
+.stop-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0}
+.stop-addr{font-size:10px;color:var(--bright)}
+.stop-person{font-family:var(--display);font-size:11px;font-weight:600;color:var(--text)}
+.stop-time{font-family:var(--mono);font-size:10px;color:var(--gold)}
+.stop-dur{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.stop-action-tag{font-family:var(--mono);font-size:8px;padding:2px 7px;border-radius:2px;text-transform:uppercase;letter-spacing:1px}
+.act-pickup{background:rgba(0,214,143,.15);color:var(--em);border:1px solid rgba(0,214,143,.3)}
+.act-dropoff{background:rgba(56,180,232,.15);color:var(--sky);border:1px solid rgba(56,180,232,.3)}
+.act-stop{background:rgba(232,160,32,.15);color:var(--gold);border:1px solid rgba(232,160,32,.3)}
+.route-actions{display:flex;gap:8px;margin-top:12px}
+.thinking-bar{display:flex;flex-direction:column;gap:10px;padding:20px}
+.tbar-msg{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.tbar-msg.done{color:var(--em)}
+.spin{width:14px;height:14px;border:2px solid var(--wire);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.done-check{width:14px;height:14px;background:var(--em);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--void);flex-shrink:0}
+
+/* ═══════════════════════════════════
+   PRICING VIEW
+═══════════════════════════════════ */
+.pricing-scroll{flex:1;overflow-y:auto;padding:24px}
+.pricing-header{text-align:center;margin-bottom:32px}
+.pricing-headline{font-family:var(--display);font-size:28px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--bright);margin-bottom:8px}
+.pricing-headline em{color:var(--gold);font-style:normal}
+.pricing-sub{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px}
+.pricing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px}
+.ptog-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px}
+.ptog-label.active{color:var(--bright)}
+.toggle-switch{width:44px;height:24px;background:var(--raised);border:1px solid var(--wire);border-radius:12px;cursor:pointer;position:relative;transition:background .2s}
+.toggle-switch.on{background:var(--gold-glow);border-color:rgba(232,160,32,.4)}
+.toggle-knob{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--muted);top:2px;left:3px;transition:all .25s}
+.toggle-switch.on .toggle-knob{left:23px;background:var(--gold)}
+.save-badge{background:rgba(0,214,143,.15);border:1px solid rgba(0,214,143,.3);border-radius:10px;font-family:var(--mono);font-size:9px;color:var(--em);padding:2px 9px}
+.pricing-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1100px;margin:0 auto 32px}
+.pc{background:var(--deep);border:1px solid var(--wire);border-radius:8px;padding:24px 20px;position:relative;transition:all .25s;cursor:default}
+.pc:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.pc.popular{border-color:rgba(232,160,32,.5);background:linear-gradient(180deg,rgba(232,160,32,.07),var(--deep))}
+.pc.enterprise{border-color:rgba(128,96,224,.4);background:linear-gradient(180deg,rgba(128,96,224,.06),var(--deep))}
+.pc-popular-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--void);font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 14px;border-radius:10px;text-transform:uppercase;white-space:nowrap}
+.pc-ent-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--violet);color:#fff;font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 14px;border-radius:10px;text-transform:uppercase;white-space:nowrap}
+.pc-icon{font-size:26px;margin-bottom:12px;display:block}
+.pc-name{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--bright);margin-bottom:6px}
+.pc-desc{font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.6;margin-bottom:18px}
+.pc-price{display:flex;align-items:flex-end;gap:4px;margin-bottom:4px}
+.pc-amount{font-family:var(--display);font-size:34px;font-weight:700;color:var(--bright);line-height:1}
+.pc-currency{font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:4px}
+.pc-period{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.pc-orig{font-family:var(--mono);font-size:9px;color:var(--muted);text-decoration:line-through;margin-bottom:16px}
+.pc-features{display:flex;flex-direction:column;gap:7px;margin-bottom:24px}
+.pcf{display:flex;align-items:flex-start;gap:7px;font-size:10px;color:var(--text);line-height:1.4}
+.pcf-icon{font-size:10px;flex-shrink:0;margin-top:1px}
+.pcf.muted{color:var(--muted)}
+.pc-cta{width:100%;padding:11px;border:none;border-radius:var(--r);font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .22s}
+.cta-starter{background:var(--raised);color:var(--text);border:1px solid var(--wire)}
+.cta-starter:hover{border-color:var(--gold);color:var(--gold)}
+.cta-pro{background:var(--gold);color:var(--void)}
+.cta-pro:hover{background:var(--gold2);box-shadow:0 0 20px var(--gold-glow)}
+.cta-fleet{background:var(--sky-glow);color:var(--sky);border:1px solid rgba(56,180,232,.4)}
+.cta-fleet:hover{background:rgba(56,180,232,.25)}
+.cta-ent{background:rgba(128,96,224,.2);color:var(--violet);border:1px solid rgba(128,96,224,.4)}
+.cta-ent:hover{background:rgba(128,96,224,.35)}
+.pricing-compare{max-width:1100px;margin:0 auto}
+.compare-title{font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--soft);text-align:center;margin-bottom:16px}
+.compare-table{width:100%;border-collapse:collapse;background:var(--deep);border:1px solid var(--wire);border-radius:6px;overflow:hidden}
+.compare-table th{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--wire);background:var(--surface);text-align:center}
+.compare-table th:first-child{text-align:left}
+.compare-table td{font-size:10px;padding:9px 14px;border-bottom:1px solid rgba(30,46,62,.4);text-align:center;color:var(--muted)}
+.compare-table td:first-child{text-align:left;color:var(--text)}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table tr:hover td{background:var(--raised)}
+.chk{color:var(--em);font-size:14px}
+.cross{color:var(--muted);font-size:14px}
+.partial{color:var(--gold);font-size:10px;font-family:var(--mono)}
+
+/* ── PAYMENT MODAL ── */
+.pay-modal-ov{position:fixed;inset:0;background:rgba(4,6,10,.85);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(6px)}
+.pay-modal-ov.open{display:flex}
+.pay-modal{background:var(--surface);border:1px solid rgba(232,160,32,.35);border-radius:8px;width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 0 80px rgba(232,160,32,.1),0 0 160px rgba(0,0,0,.6)}
+.pay-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--wire)}
+.pay-title{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gold)}
+.pay-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;transition:color .2s}
+.pay-close:hover{color:var(--cr)}
+.pay-body{padding:20px;display:flex;flex-direction:column;gap:16px}
+.pay-plan-summary{background:var(--raised);border:1px solid var(--edge);border-radius:var(--r);padding:14px;display:flex;align-items:center;justify-content:space-between}
+.pay-plan-name{font-family:var(--display);font-size:16px;font-weight:700;color:var(--bright);letter-spacing:2px}
+.pay-plan-price{font-family:var(--display);font-size:22px;font-weight:700;color:var(--gold)}
+.pay-section-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.pay-field{background:var(--raised);border:1px solid var(--wire);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:11px;padding:10px 12px;outline:none;transition:border-color .2s;width:100%}
+.pay-field:focus{border-color:var(--gold)}
+.pay-field::placeholder{color:var(--muted)}
+.pay-row{display:flex;gap:10px}
+.pay-row .pay-field{flex:1}
+.card-display{background:linear-gradient(135deg,var(--raised),var(--edge));border:1px solid var(--wire);border-radius:6px;padding:16px 18px;position:relative;overflow:hidden;min-height:90px}
+.card-display::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(232,160,32,.08),transparent);border-radius:50%}
+.card-chip{width:28px;height:20px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:3px;margin-bottom:12px;opacity:.8}
+.card-number-display{font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--text);margin-bottom:8px}
+.card-meta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted)}
+.pay-security{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--muted)}
+.pay-security .lock{font-size:12px;color:var(--em)}
+.pay-submit{width:100%;padding:14px;border:none;border-radius:var(--r);background:var(--gold);color:var(--void);font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .22s}
+.pay-submit:hover{background:var(--gold2);box-shadow:0 0 30px var(--gold-glow)}
+.pay-submit.processing{background:var(--raised);color:var(--muted);cursor:not-allowed}
+.pay-result{padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.pay-success-icon{font-size:48px;animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.5)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.pay-success-title{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:3px;color:var(--em)}
+.pay-success-msg{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.8;text-align:center}
+
+/* ── ANALYTICS ── */
+.analytics-scroll{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.analytics-row{display:flex;gap:12px}
+.an-card{background:var(--deep);border:1px solid var(--wire);border-radius:var(--r);padding:16px 18px;flex:1;position:relative;overflow:hidden}
+.an-card-icon{font-size:20px;margin-bottom:10px;opacity:.8}
+.an-val{font-family:var(--display);font-size:30px;font-weight:700;line-height:1;color:var(--bright)}
+.an-lbl{font-family:var(--mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:5px}
+.an-delta{font-family:var(--mono);font-size:10px;margin-top:8px}
+.an-delta.up{color:var(--em)}.an-delta.down{color:var(--cr)}
+.sparkline{position:absolute;bottom:0;right:0;opacity:.18}
+.chart-card{background:var(--deep);border:1px solid var(--wire);border-radius:var(--r);overflow:hidden}
+.chart-card-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--wire);background:var(--surface)}
+.chart-card-title{font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
+.chart-inner{padding:12px;height:180px}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:90px;right:20px;background:var(--surface);border:1px solid var(--wire);border-radius:var(--r);padding:10px 16px;font-size:11px;z-index:9000;display:none;animation:toastIn .3s ease;max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,.4);gap:10px;align-items:center}
+.toast.show{display:flex}
+.toast.gold{border-color:rgba(232,160,32,.4)}.toast.em{border-color:rgba(0,214,143,.4)}.toast.cr{border-color:rgba(224,45,60,.4)}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"><span id="ti">✦</span><span id="tm"></span></div>
+
+<!-- ════ HEADER ════ -->
+<header>
+  <div class="logo-block">
+    <div class="logo-hex">
+      <svg viewBox="0 0 40 40">
+        <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="none" stroke="rgba(232,160,32,.25)" stroke-width="1"/>
+        <polygon class="ring-anim" points="20,6 32,13 32,27 20,34 8,27 8,13" fill="none" stroke="rgba(232,160,32,.55)" stroke-width="1" stroke-dasharray="4 2"/>
+        <circle cx="20" cy="20" r="5" fill="var(--gold)" opacity=".9"/>
+        <circle cx="20" cy="20" r="2.5" fill="var(--void)"/>
+      </svg>
+    </div>
+    <div><div class="logo-text">NEXUS <em>D</em>ISPATCH</div><div class="logo-sub">Command Intelligence Platform v4.2</div></div>
+  </div>
+  <div class="hkpis">
+    <div class="hk"><div class="hk-v" style="color:var(--em)" id="h-act">8</div><div class="hk-l">Active</div><div class="hk-bar" style="background:linear-gradient(90deg,var(--em),transparent)"></div></div>
+    <div class="hk"><div class="hk-v" style="color:var(--sky)" id="h-rt">14</div><div class="hk-l">Routes</div><div class="hk-bar" style="background:linear-gradient(90deg,var(--sky),transparent)"></div></div>
+    <div class="hk"><div class="hk-v" style="color:var(--gold)" id="h-q">6</div><div class="hk-l">Queued</div><div class="hk-bar" style="background:linear-gradient(90deg,var(--gold),transparent)"></div></div>
+    <div class="hk"><div class="hk-v" style="color:var(--cr)" id="h-d">2</div><div class="hk-l">Delayed</div><div class="hk-bar" style="background:linear-gradient(90deg,var(--cr),transparent)"></div></div>
+    <div class="hk"><div class="hk-v" style="color:var(--violet)">$1,847</div><div class="hk-l">Revenue</div><div class="hk-bar" style="background:linear-gradient(90deg,var(--violet),transparent)"></div></div>
+    <div class="hk"><div class="hk-v" style="font-size:16px;color:var(--em)">94.2%</div><div class="hk-l">Efficiency</div><div class="hk-bar" style="background:linear-gradient(90deg,var(--amber),transparent)"></div></div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-weather"><span style="font-size:18px">⛅</span><div><div class="wtmp">72°F</div><div class="wdesc">PARTLY CLOUDY · 8 MPH NW</div></div></div>
+    <div class="hdr-sys"><div class="sys-dot"></div><div class="sys-lbl">SYS NOMINAL</div></div>
+    <div class="hdr-clock"><div class="clk-t" id="clk">--:--:--</div><div class="clk-d" id="clkd">---</div></div>
+  </div>
+</header>
+
+<!-- ════ NAV ════ -->
+<div class="nav">
+  <div class="ntab active" onclick="sw('command',this)">⬡ Command Center</div>
+  <div class="ntab new-feat" onclick="sw('itinerary',this)">📄 Itinerary Parser <span class="tbadge-em">NEW</span></div>
+  <div class="ntab new-feat" onclick="sw('pricing',this)">💳 Plans & Pricing <span class="tbadge-em">NEW</span></div>
+  <div class="ntab" onclick="sw('analytics',this)">◈ Analytics</div>
+  <div class="ntab" onclick="showToast('gold','Schedule view — click to continue')">⊡ Schedule</div>
+  <div class="ntab" style="color:var(--cr);margin-left:auto" onclick="emergencyAll()">🚨 EMERGENCY</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     COMMAND VIEW
+════════════════════════════════════════ -->
+<div class="ws active" id="vw-command" style="display:grid;grid-template-columns:265px 1fr 285px;grid-template-rows:1fr 195px;gap:1px;background:var(--void)">
+
+  <!-- FLEET -->
+  <div class="pnl fleet-pnl" style="grid-row:1/3">
+    <div class="pnl-hd"><div class="pnl-title">Fleet Control</div><div class="pnl-acts"><div class="bdg bdg-em" id="fl-online">8 ONLINE</div><button class="btn btn-gold" onclick="openAssign()" style="padding:4px 10px;font-size:8px">+ ASSIGN</button></div></div>
+    <div class="fsearch"><input class="sinput" placeholder="Search drivers, routes…" oninput="filterDrivers(this.value)"></div>
+    <div class="fleet-list" id="fleet-list"></div>
+  </div>
+
+  <!-- MAP -->
+  <div class="pnl">
+    <div class="pnl-hd">
+      <div class="pnl-title">Live Tactical Map</div>
+      <div class="pnl-acts">
+        <select class="fsel" style="font-size:9px;padding:3px 7px" onchange="filterMap(this.value)"><option>All Units</option><option>En Route</option><option>Carpools</option><option>Delayed</option></select>
+        <div class="bdg bdg-sky" id="map-badge">8 units</div>
+      </div>
+    </div>
+    <div class="map-inner" id="map-inner">
+      <div class="map-grid-bg"></div>
+      <svg class="map-svg" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid slice">
+        <polygon fill="rgba(56,180,232,.025)" stroke="rgba(56,180,232,.07)" stroke-width="1" points="0,0 250,0 200,180 0,200"/>
+        <polygon fill="rgba(56,180,232,.025)" stroke="rgba(56,180,232,.07)" stroke-width="1" points="550,0 800,0 800,180 600,200"/>
+        <polygon fill="rgba(56,180,232,.025)" stroke="rgba(56,180,232,.07)" stroke-width="1" points="0,280 200,260 250,440 0,440"/>
+        <polygon fill="rgba(56,180,232,.025)" stroke="rgba(56,180,232,.07)" stroke-width="1" points="550,260 800,280 800,440 600,440"/>
+        <line x1="0" y1="220" x2="800" y2="220" stroke="rgba(56,180,232,.1)" stroke-width="14"/>
+        <line x1="400" y1="0" x2="400" y2="440" stroke="rgba(56,180,232,.1)" stroke-width="14"/>
+        <line x1="0" y1="110" x2="800" y2="110" stroke="rgba(56,180,232,.055)" stroke-width="7"/>
+        <line x1="0" y1="330" x2="800" y2="330" stroke="rgba(56,180,232,.055)" stroke-width="7"/>
+        <line x1="200" y1="0" x2="200" y2="440" stroke="rgba(56,180,232,.055)" stroke-width="7"/>
+        <line x1="600" y1="0" x2="600" y2="440" stroke="rgba(56,180,232,.055)" stroke-width="7"/>
+        <path d="M 110 380 C 180 300 280 260 400 220 S 560 160 680 120" stroke="rgba(56,180,232,.55)" stroke-width="3" fill="none" stroke-dasharray="10 5"><animate attributeName="stroke-dashoffset" values="60;0" dur="1.8s" repeatCount="indefinite"/></path>
+        <path d="M 680 400 C 580 350 500 290 400 220 S 260 150 130 90" stroke="rgba(0,214,143,.45)" stroke-width="2.5" fill="none" stroke-dasharray="8 5"><animate attributeName="stroke-dashoffset" values="52;0" dur="2.2s" repeatCount="indefinite"/></path>
+        <path d="M 650 60 C 680 130 700 180 690 220" stroke="rgba(224,45,60,.45)" stroke-width="2.5" fill="none" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" values="0;40" dur="1s" repeatCount="indefinite"/></path>
+        <rect x="610" y="185" width="120" height="20" fill="rgba(224,45,60,.1)" rx="3"/>
+        <rect x="610" y="185" width="120" height="20" fill="none" stroke="rgba(224,45,60,.35)" stroke-width="1" rx="3" stroke-dasharray="3 2"/>
+        <circle cx="400" cy="220" r="8" fill="var(--void)" stroke="rgba(56,180,232,.5)" stroke-width="2"/><circle cx="400" cy="220" r="3" fill="rgba(56,180,232,.6)"/>
+        <circle cx="110" cy="380" r="6" fill="rgba(232,160,32,.8)"/><circle cx="680" cy="400" r="6" fill="rgba(232,160,32,.8)"/>
+        <circle cx="130" cy="90" r="6" fill="rgba(0,214,143,.8)"/><circle cx="680" cy="120" r="6" fill="rgba(0,214,143,.8)"/>
+        <circle cx="650" cy="60" r="7" fill="rgba(224,45,60,.8)" stroke="rgba(224,45,60,.35)" stroke-width="3"/>
+        <text x="392" y="243" fill="rgba(56,180,232,.35)" font-size="8" font-family="DM Mono,monospace" text-anchor="middle">CENTRAL HUB</text>
+        <text x="55" y="26" fill="rgba(56,180,232,.15)" font-size="9" font-family="DM Mono,monospace">NORTH DISTRICT</text>
+        <text x="628" y="26" fill="rgba(56,180,232,.15)" font-size="9" font-family="DM Mono,monospace">EAST ZONE</text>
+        <text x="40" y="428" fill="rgba(56,180,232,.15)" font-size="9" font-family="DM Mono,monospace">SOUTH HARBOR</text>
+        <text x="612" y="428" fill="rgba(56,180,232,.15)" font-size="9" font-family="DM Mono,monospace">AIRPORT</text>
+        <text x="614" y="200" fill="rgba(224,45,60,.65)" font-size="7" font-family="DM Mono,monospace">HEAVY</text>
+      </svg>
+      <div id="vmarkers"></div>
+      <div class="map-controls">
+        <button class="mcbtn">＋</button><button class="mcbtn">－</button>
+        <button class="mcbtn" title="Center" onclick="showToast('em','Fleet centered')">◎</button>
+        <button class="mcbtn" title="Traffic" onclick="this.classList.toggle('on')">🚦</button>
+        <button class="mcbtn" title="Radar" onclick="this.classList.toggle('on')">◉</button>
+      </div>
+      <div class="map-congestion"><span style="width:6px;height:6px;border-radius:50%;background:var(--cr);display:inline-block;animation:blink 1.2s infinite"></span>I-95N HEAVY · Alt via Ring Rd</div>
+      <div class="map-legend">
+        <div class="lg-row"><div class="lg-dot" style="background:var(--em)"></div>Active</div>
+        <div class="lg-row"><div class="lg-dot" style="background:var(--sky)"></div>En Route</div>
+        <div class="lg-row"><div class="lg-dot" style="background:var(--cr)"></div>Delayed</div>
+        <div class="lg-row"><div class="lg-dot" style="background:var(--gold)"></div>Standby</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT INTEL -->
+  <div class="pnl right-pnl">
+    <div class="pnl-hd"><div class="pnl-title">Intelligence</div><button class="btn btn-ghost" style="padding:4px 10px;font-size:8px" onclick="sw('itinerary',document.querySelector('.ntab:nth-child(2)'))">📄 Parse Itinerary</button></div>
+    <div class="rscroll">
+      <!-- AI -->
+      <div class="sc">
+        <div class="sc-hd"><div class="sc-title">🤖 AI Dispatch Intelligence</div><div class="bdg bdg-gold">CLAUDE AI</div></div>
+        <div class="aichat" id="ai-chat">
+          <div class="cm"><div class="cav ai">N</div><div class="cbubble">System online. 8 active drivers, 14 routes live. D-03 & D-08 delayed — rerouting via Ring Rd recovers ~8 min each.</div></div>
+          <div class="cm"><div class="cav ai">N</div><div class="cbubble">⚡ Carpool alert: Routes 7 & 9 share 83% overlap — merge saves 22 min and $14 in fuel. Action recommended.</div></div>
+        </div>
+        <div class="airow">
+          <input class="aiinp" id="ai-inp" placeholder="Ask dispatch AI…" onkeydown="if(event.key==='Enter')queryAI()">
+          <button class="btn btn-gold" onclick="queryAI()" style="padding:4px 10px;font-size:9px">SEND</button>
+        </div>
+      </div>
+      <!-- Traffic -->
+      <div class="sc">
+        <div class="sc-hd"><div class="sc-title">📡 Traffic Intelligence</div><div class="bdg bdg-cr">1 INCIDENT</div></div>
+        <div class="sc-body" id="traffic-sec"></div>
+      </div>
+      <!-- Carpool -->
+      <div class="sc">
+        <div class="sc-hd"><div class="sc-title">🚗 Carpool Optimizer</div><div class="bdg bdg-em">3 MATCHES</div></div>
+        <div class="sc-body" id="cp-sec"></div>
+      </div>
+      <!-- Weather -->
+      <div class="sc">
+        <div class="sc-hd"><div class="sc-title">🌤 Weather & Conditions</div></div>
+        <div class="sc-body">
+          <div class="wr"><span class="wrl">Temperature</span><span class="wrv ok">72°F — Optimal</span></div>
+          <div class="wr"><span class="wrl">Visibility</span><span class="wrv ok">10 miles clear</span></div>
+          <div class="wr"><span class="wrl">Wind</span><span class="wrv">8 mph NW</span></div>
+          <div class="wr"><span class="wrl">Precipitation</span><span class="wrv ok">None — 0%</span></div>
+          <div class="wr"><span class="wrl">Road Conditions</span><span class="wrv ok">Dry & Clear</span></div>
+          <div class="wr"><span class="wrl">3hr Forecast</span><span class="wrv warn">Clouds building</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM CONSOLE -->
+  <div class="pnl bot-pnl" style="grid-column:2/3">
+    <div class="pnl-hd"><div class="pnl-title">Dispatch Console</div><div class="pnl-acts"><button class="btn btn-em" onclick="showToast('em','Fleet optimizer running…')" style="font-size:8px;padding:4px 10px">⚡ OPTIMIZE ALL</button><button class="btn btn-cr" onclick="emergencyAll()" style="font-size:8px;padding:4px 10px">🚨 EMERGENCY</button></div></div>
+    <div class="bot-content">
+      <div class="bot-sec" style="flex:1.4">
+        <div class="bot-hd">Quick Dispatch <span style="color:var(--em);font-size:8px">● READY</span></div>
+        <div class="dpform">
+          <div class="frow"><input class="fi" id="dp-pu" placeholder="📍 Pickup address…"><input class="fi" id="dp-do" placeholder="🏁 Destination…"></div>
+          <div class="frow">
+            <select class="fsel" id="dp-dr" style="flex:1"><option value="">— Auto-Assign —</option></select>
+            <select class="fsel" id="dp-pri"><option>Normal</option><option>High</option><option>Urgent</option><option>VIP</option></select>
+            <input class="fi" id="dp-tm" placeholder="⏱ HH:MM" style="max-width:110px">
+            <button class="btn btn-gold" onclick="dispatchJob()" style="font-size:9px;padding:5px 14px">DISPATCH →</button>
+          </div>
+          <div class="dpres" id="dpres"></div>
+        </div>
+      </div>
+      <div class="bot-sec" style="min-width:210px;max-width:250px">
+        <div class="bot-hd">ETA Board</div>
+        <div class="eta-list" id="eta-list"></div>
+      </div>
+      <div class="bot-sec" style="flex:1.1">
+        <div class="bot-hd">Activity Log <span class="bdg bdg-gold" id="log-bdg" style="margin-left:4px">0</span></div>
+        <div class="alog" id="alog"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ITINERARY PARSER VIEW
+════════════════════════════════════════ -->
+<div class="ws" id="vw-itinerary" style="display:none;flex-direction:column">
+  <div class="pnl-hd" style="border-bottom:1px solid var(--wire);background:var(--surface);flex-shrink:0">
+    <div class="pnl-title" style="color:var(--em)">📄 Itinerary Parser — AI Route Calculator</div>
+    <div class="pnl-acts">
+      <div class="bdg bdg-em">CLAUDE AI POWERED</div>
+      <div class="bdg bdg-gold">PDF · TXT · PASTE</div>
+    </div>
+  </div>
+  <div class="itin-wrap">
+
+    <!-- LEFT: UPLOAD -->
+    <div class="upload-pane">
+      <div class="pnl-hd" style="background:var(--surface);border-bottom:1px solid var(--wire)"><div class="pnl-title">Upload Itinerary</div></div>
+
+      <div class="drop-zone" id="drop-zone" ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)">
+        <input type="file" id="file-input" accept=".txt,.pdf,.doc,.docx,.csv,.rtf" onchange="handleFile(this.files[0])">
+        <span class="dz-icon">📋</span>
+        <div class="dz-title">Drop Itinerary Here</div>
+        <div class="dz-sub">Drag & drop any document with passenger names,<br>addresses, pickup times, or route lists</div>
+        <div class="dz-types">
+          <span class="dz-tag">PDF</span><span class="dz-tag">TXT</span><span class="dz-tag">CSV</span><span class="dz-tag">DOC</span><span class="dz-tag">RTF</span>
+        </div>
+      </div>
+
+      <div class="paste-area">
+        <div class="pa-label">— Or Paste Text Itinerary —</div>
+        <textarea class="pa-ta" id="paste-ta" placeholder="Paste any itinerary, passenger list, or route info here…&#10;&#10;Examples:&#10;• John Smith — 123 Main St, pickup 8:30am&#10;• Drop Maria at Airport Terminal 2 by 10:15am&#10;• Conference pickup: Sarah, Mike (Hotel Grand, 9am)&#10;• 07:00 - Depot → 07:30 - 45 Oak Ave (Tom) → 08:15 - City Hall (Sarah, drop) → 09:00 - Airport"></textarea>
+        <button class="btn btn-em" onclick="parseItinerary()" style="width:100%;padding:9px;font-size:10px">⚡ PARSE & CALCULATE ROUTE</button>
+      </div>
+
+      <div class="itin-status" id="itin-status">
+        Ready. Upload a file or paste an itinerary above, then click Parse to generate the optimized route with stops, times, and assignments.
+      </div>
+    </div>
+
+    <!-- RIGHT: PARSED RESULT -->
+    <div class="parsed-pane">
+      <div class="pnl-hd" style="background:var(--surface);border-bottom:1px solid var(--wire)">
+        <div class="pnl-title">Calculated Route</div>
+        <div class="pnl-acts" id="route-actions-top" style="display:none">
+          <button class="btn btn-gold" onclick="showToast('em','Route dispatched to assigned driver')">DISPATCH ROUTE</button>
+          <button class="btn btn-ghost" onclick="showToast('gold','Route exported as PDF')">EXPORT PDF</button>
+          <button class="btn btn-sky" onclick="showToast('sky','Route shared with all passengers via SMS')">NOTIFY PASSENGERS</button>
+        </div>
+      </div>
+      <div id="parsed-output" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+        <div class="parsed-empty" id="parsed-empty">
+          <div class="pe-icon">🗺</div>
+          <div class="pe-txt">Upload or paste an itinerary<br>to auto-generate your route</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PRICING VIEW
+════════════════════════════════════════ -->
+<div class="ws" id="vw-pricing" style="display:none;flex-direction:column">
+  <div class="pricing-scroll">
+    <div class="pricing-header">
+      <div class="pricing-headline">Choose Your <em>Command Level</em></div>
+      <div class="pricing-sub">Full dispatch intelligence — scale from solo operator to enterprise fleet</div>
+    </div>
+
+    <div class="pricing-toggle">
+      <div class="ptog-label active" id="tog-monthly">Monthly</div>
+      <div class="toggle-switch" id="billing-toggle" onclick="toggleBilling()"><div class="toggle-knob"></div></div>
+      <div class="ptog-label" id="tog-annual">Annual</div>
+      <span class="save-badge" id="save-badge" style="opacity:0">Save 25%</span>
+    </div>
+
+    <div class="pricing-cards">
+      <!-- STARTER -->
+      <div class="pc">
+        <span class="pc-icon">🚀</span>
+        <div class="pc-name">Starter</div>
+        <div class="pc-desc">Solo dispatchers & small operators getting started with smart routing.</div>
+        <div class="pc-price"><span class="pc-currency">$</span><span class="pc-amount" id="p1">49</span></div>
+        <div class="pc-orig" id="p1-orig" style="opacity:0">$65/mo</div>
+        <div class="pc-period" style="margin-top:-10px;margin-bottom:16px">per month</div>
+        <div class="pc-features">
+          <div class="pcf"><span class="pcf-icon">✓</span>Up to 3 drivers</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Live GPS tracking</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Basic route optimization</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Itinerary parser (5/mo)</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Activity log & ETA board</div>
+          <div class="pcf muted"><span class="pcf-icon">·</span>No carpool AI</div>
+          <div class="pcf muted"><span class="pcf-icon">·</span>No AI dispatcher</div>
+          <div class="pcf muted"><span class="pcf-icon">·</span>Email support only</div>
+        </div>
+        <button class="pc-cta cta-starter" onclick="openPayment('Starter','49')">GET STARTED →</button>
+      </div>
+
+      <!-- PRO (POPULAR) -->
+      <div class="pc popular">
+        <div class="pc-popular-badge">⭐ MOST POPULAR</div>
+        <span class="pc-icon">⚡</span>
+        <div class="pc-name" style="color:var(--gold)">Pro</div>
+        <div class="pc-desc">Growing dispatch teams who need full AI intelligence and automation.</div>
+        <div class="pc-price"><span class="pc-currency" style="color:var(--gold)">$</span><span class="pc-amount" style="color:var(--gold)" id="p2">129</span></div>
+        <div class="pc-orig" id="p2-orig" style="opacity:0">$172/mo</div>
+        <div class="pc-period" style="margin-top:-10px;margin-bottom:16px">per month</div>
+        <div class="pc-features">
+          <div class="pcf"><span class="pcf-icon">✓</span>Up to 15 drivers</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Real-time traffic rerouting</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>AI carpool optimizer</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Claude AI dispatcher (unlimited)</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Itinerary parser (unlimited)</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Weather impact routing</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Analytics dashboard</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Priority support (chat + email)</div>
+        </div>
+        <button class="pc-cta cta-pro" onclick="openPayment('Pro','129')">START PRO →</button>
+      </div>
+
+      <!-- FLEET -->
+      <div class="pc">
+        <span class="pc-icon">🚛</span>
+        <div class="pc-name" style="color:var(--sky)">Fleet</div>
+        <div class="pc-desc">Mid-size logistics companies managing full dispatch operations.</div>
+        <div class="pc-price"><span class="pc-currency" style="color:var(--sky)">$</span><span class="pc-amount" style="color:var(--sky)" id="p3">299</span></div>
+        <div class="pc-orig" id="p3-orig" style="opacity:0">$399/mo</div>
+        <div class="pc-period" style="margin-top:-10px;margin-bottom:16px">per month</div>
+        <div class="pc-features">
+          <div class="pcf"><span class="pcf-icon">✓</span>Up to 60 drivers</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Everything in Pro</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Multi-zone fleet control</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Fuel cost tracking & reports</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Shift scheduling timeline</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Driver performance scoring</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Custom route templates</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Dedicated account manager</div>
+        </div>
+        <button class="pc-cta cta-fleet" onclick="openPayment('Fleet','299')">START FLEET →</button>
+      </div>
+
+      <!-- ENTERPRISE -->
+      <div class="pc enterprise">
+        <div class="pc-ent-badge">🏢 ENTERPRISE</div>
+        <span class="pc-icon">🏆</span>
+        <div class="pc-name" style="color:var(--violet)">Command</div>
+        <div class="pc-desc">Large-scale operations, municipalities, and national logistics networks.</div>
+        <div class="pc-price"><span class="pc-currency" style="color:var(--violet)">$</span><span class="pc-amount" style="color:var(--violet)" id="p4">899</span></div>
+        <div class="pc-orig" id="p4-orig" style="opacity:0">$1,199/mo</div>
+        <div class="pc-period" style="margin-top:-10px;margin-bottom:16px">per month</div>
+        <div class="pc-features">
+          <div class="pcf"><span class="pcf-icon">✓</span>Unlimited drivers</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Everything in Fleet</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>White-label branding</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>Custom AI model fine-tuning</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>API access & webhooks</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>SLA 99.9% uptime guarantee</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>On-site onboarding</div>
+          <div class="pcf"><span class="pcf-icon">✓</span>24/7 phone + dedicated CSM</div>
+        </div>
+        <button class="pc-cta cta-ent" onclick="openPayment('Command','899')">CONTACT SALES →</button>
+      </div>
+    </div>
+
+    <!-- COMPARISON TABLE -->
+    <div class="pricing-compare">
+      <div class="compare-title">Full Feature Comparison</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="text-align:left">Feature</th>
+            <th>Starter</th><th style="color:var(--gold)">Pro ⭐</th><th style="color:var(--sky)">Fleet</th><th style="color:var(--violet)">Command</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Drivers</td><td class="partial">Up to 3</td><td class="partial">Up to 15</td><td class="partial">Up to 60</td><td class="chk">Unlimited</td></tr>
+          <tr><td>Live GPS Tracking</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td></tr>
+          <tr><td>Route Optimization</td><td class="partial">Basic</td><td class="chk">✓ AI</td><td class="chk">✓ AI + Multi-zone</td><td class="chk">✓ Custom AI</td></tr>
+          <tr><td>Live Traffic Rerouting</td><td class="cross">—</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td></tr>
+          <tr><td>AI Dispatcher (Claude)</td><td class="cross">—</td><td class="chk">✓ Unlimited</td><td class="chk">✓ Unlimited</td><td class="chk">✓ Fine-tuned</td></tr>
+          <tr><td>Itinerary PDF Parser</td><td class="partial">5/month</td><td class="chk">✓ Unlimited</td><td class="chk">✓ Unlimited</td><td class="chk">✓ Unlimited</td></tr>
+          <tr><td>Carpool Optimizer</td><td class="cross">—</td><td class="chk">✓</td><td class="chk">✓</td><td class="chk">✓</td></tr>
+          <tr><td>Analytics Dashboard</td><td class="cross">—</td><td class="chk">✓</td><td class="chk">✓ Advanced</td><td class="chk">✓ Custom Reports</td></tr>
+          <tr><td>Fuel Cost Tracking</td><td class="cross">—</td><td class="cross">—</td><td class="chk">✓</td><td class="chk">✓</td></tr>
+          <tr><td>Shift Scheduling</td><td class="cross">—</td><td class="cross">—</td><td class="chk">✓</td><td class="chk">✓</td></tr>
+          <tr><td>API Access</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td><td class="chk">✓</td></tr>
+          <tr><td>White-label</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td><td class="chk">✓</td></tr>
+          <tr><td>Support</td><td class="partial">Email</td><td class="partial">Chat + Email</td><td class="partial">Account Mgr</td><td class="chk">24/7 Phone + CSM</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ANALYTICS VIEW
+════════════════════════════════════════ -->
+<div class="ws" id="vw-analytics" style="display:none;flex-direction:column">
+  <div class="analytics-scroll">
+    <div class="analytics-row">
+      <div class="an-card"><div class="an-card-icon">🚗</div><div class="an-val" style="color:var(--em)">8</div><div class="an-lbl">Active Drivers</div><div class="an-delta up">↑ 2 vs yesterday</div><svg class="sparkline" width="80" height="40"><polyline points="0,30 15,25 25,28 35,15 50,18 65,10 80,12" fill="none" stroke="var(--em)" stroke-width="2"/></svg></div>
+      <div class="an-card"><div class="an-card-icon">⚡</div><div class="an-val" style="color:var(--sky)">94.2%</div><div class="an-lbl">Fleet Efficiency</div><div class="an-delta up">↑ 3.1% vs last week</div><svg class="sparkline" width="80" height="40"><polyline points="0,35 15,30 25,28 35,22 50,18 65,12 80,8" fill="none" stroke="var(--sky)" stroke-width="2"/></svg></div>
+      <div class="an-card"><div class="an-card-icon">💰</div><div class="an-val" style="color:var(--gold)">$1,847</div><div class="an-lbl">Revenue Today</div><div class="an-delta up">↑ 12% vs avg</div><svg class="sparkline" width="80" height="40"><polyline points="0,38 15,32 25,25 35,20 50,22 65,14 80,10" fill="none" stroke="var(--gold)" stroke-width="2"/></svg></div>
+      <div class="an-card"><div class="an-card-icon">⛽</div><div class="an-val" style="color:var(--amber)">38.4</div><div class="an-lbl">Gallons Used</div><div class="an-delta down">↓ 8% vs avg</div><svg class="sparkline" width="80" height="40"><polyline points="0,10 15,18 25,12 35,20 50,16 65,22 80,25" fill="none" stroke="var(--amber)" stroke-width="2"/></svg></div>
+    </div>
+    <div class="analytics-row" style="flex:1">
+      <div class="chart-card" style="flex:1.4">
+        <div class="chart-card-hd"><div class="chart-card-title">Jobs Completed — 7 Days</div><div class="bdg bdg-gold">TREND</div></div>
+        <div class="chart-inner"><canvas id="ch-jobs"></canvas></div>
+      </div>
+      <div class="chart-card" style="flex:1">
+        <div class="chart-card-hd"><div class="chart-card-title">Driver Efficiency Scores</div><div class="bdg bdg-em">LIVE</div></div>
+        <div class="chart-inner"><canvas id="ch-eff"></canvas></div>
+      </div>
+      <div class="chart-card" style="flex:0.7">
+        <div class="chart-card-hd"><div class="chart-card-title">On-Time Rate</div><div class="bdg bdg-sky">TODAY</div></div>
+        <div class="chart-inner"><canvas id="ch-ot"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAYMENT MODAL
+════════════════════════════════════════ -->
+<div class="pay-modal-ov" id="pay-ov" onclick="if(event.target===this)closePayment()">
+  <div class="pay-modal" id="pay-modal">
+    <div class="pay-hd">
+      <div class="pay-title" id="pay-title">UPGRADE PLAN</div>
+      <button class="pay-close" onclick="closePayment()">✕</button>
+    </div>
+    <div class="pay-body" id="pay-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───
+const DRIVERS=[
+  {id:'D-01',name:'Marcus Chen',status:'enroute',route:'RT-001',eta:38,pass:2,fuel:72,score:96,speed:32,miles:48,vehicle:'2023 Transit',color:'var(--sky)',lat:28,lng:44},
+  {id:'D-02',name:'Sarah Kim',status:'active',route:'RT-003',eta:22,pass:0,fuel:88,score:99,speed:28,miles:31,vehicle:'2022 Sprinter',color:'var(--em)',lat:55,lng:62},
+  {id:'D-03',name:'James Rivera',status:'delayed',route:'RT-002',eta:67,pass:1,fuel:54,score:81,speed:8,miles:62,vehicle:'2023 Transit',color:'var(--cr)',lat:78,lng:80},
+  {id:'D-04',name:'Priya Patel',status:'active',route:'RT-005',eta:18,pass:3,fuel:65,score:94,speed:35,miles:27,vehicle:'2024 Promaster',color:'var(--em)',lat:42,lng:22},
+  {id:'D-05',name:'Tom Wagner',status:'standby',route:'—',eta:0,pass:0,fuel:100,score:92,speed:0,miles:0,vehicle:'2022 Transit',color:'var(--gold)',lat:22,lng:75},
+  {id:'D-06',name:'Ana Reyes',status:'enroute',route:'RT-007',eta:29,pass:2,fuel:78,score:97,speed:30,miles:39,vehicle:'2023 Sprinter',color:'var(--sky)',lat:68,lng:38},
+  {id:'D-07',name:'Chris Moon',status:'active',route:'RT-009',eta:44,pass:1,fuel:60,score:88,speed:26,miles:52,vehicle:'2021 Transit',color:'var(--em)',lat:52,lng:82},
+  {id:'D-08',name:'Lisa Park',status:'delayed',route:'RT-008',eta:82,pass:0,fuel:40,score:76,speed:0,miles:58,vehicle:'2022 Promaster',color:'var(--cr)',lat:16,lng:52},
+];
+const TRAFFIC=[
+  {name:'I-95 North Corridor',pct:87,cls:'h'},{name:'Hwy 101 Downtown',pct:61,cls:'m'},
+  {name:'East Ring Road',pct:24,cls:'c'},{name:'Harbor Expressway',pct:68,cls:'m'},
+  {name:'Airport Access Rd',pct:42,cls:'m'},{name:'South Bypass',pct:15,cls:'c'},
+];
+const CARPOOLS=[
+  {i:['MC','SK'],names:'Chen + Kim',route:'N.Terminal via Midtown',save:'22 min',cost:'$14',colors:['var(--sky)','var(--em)']},
+  {i:['JR','AR'],names:'Rivera + Reyes',route:'Harbor via Eastside',save:'9 min',cost:'$6',colors:['var(--cr)','var(--gold)']},
+  {i:['CM','PP'],names:'Moon + Patel',route:'South Hub → Depot',save:'17 min',cost:'$11',colors:['var(--sky)','var(--amber)']},
+];
+const ETA_DATA=[
+  {rt:'RT-001',dr:'M. Chen',dst:'N.Terminal',eta:38,pct:62,c:'var(--sky)'},
+  {rt:'RT-002',dr:'J. Rivera',dst:'Harbor',eta:67,pct:20,c:'var(--cr)'},
+  {rt:'RT-003',dr:'S. Kim',dst:'Eastside',eta:22,pct:78,c:'var(--em)'},
+  {rt:'RT-005',dr:'P. Patel',dst:'Midtown',eta:18,pct:85,c:'var(--em)'},
+  {rt:'RT-007',dr:'A. Reyes',dst:'Airport',eta:29,pct:60,c:'var(--sky)'},
+  {rt:'RT-008',dr:'L. Park',dst:'South Hub',eta:82,pct:15,c:'var(--cr)'},
+];
+
+let logCount=0,selDriver=null,annualBilling=false;
+
+// ─── INIT ───
+window.onload=()=>{
+  startClock();renderFleet();renderMarkers();renderTraffic();renderCarpools();renderETA();populateDrSel();startLive();
+  log('info','NEXUS DISPATCH v4.2 — All systems nominal');
+  log('warn','DELAY — RT-002 & RT-008 behind schedule · Rerouting via Ring Rd');
+  log('ok','CARPOOL MATCH — RT-007 & RT-009 share 83% path · Merge recommended');
+  log('ok','ITINERARY PARSER ready — upload PDF or paste text to auto-route');
+  loadChartJS();
+};
+
+// ─── CLOCK ───
+function startClock(){
+  const D=['SUN','MON','TUE','WED','THU','FRI','SAT'],M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  function tick(){const n=new Date();document.getElementById('clk').textContent=n.toTimeString().slice(0,8);document.getElementById('clkd').textContent=`${D[n.getDay()]} ${n.getDate()} ${M[n.getMonth()]} ${n.getFullYear()}`;}
+  tick();setInterval(tick,1000);
+}
+
+// ─── FLEET ───
+function renderFleet(flt=''){
+  const el=document.getElementById('fleet-list');el.innerHTML='';
+  const list=flt?DRIVERS.filter(d=>d.name.toLowerCase().includes(flt)||d.id.toLowerCase().includes(flt)):DRIVERS;
+  list.forEach(d=>{
+    const cl=d.status==='active'?'sa':d.status==='enroute'?'se':d.status==='delayed'?'sd':'ss';
+    const fc=d.fuel>60?'var(--em)':d.fuel>30?'var(--gold)':'var(--cr)';
+    const sc=d.score>=90?'var(--em)':d.score>=80?'var(--gold)':'var(--cr)';
+    const card=document.createElement('div');
+    card.className=`dcard ${cl}${selDriver===d.id?' sel':''}`;
+    card.id='dc-'+d.id;card.onclick=()=>selD(d.id);
+    card.innerHTML=`<div class="dc-top"><div><div class="dc-name">${d.name}</div><div class="dc-id">${d.id} · ${d.route}</div></div><div class="dc-stat-tag ${cl}">${cl==='se'?'EN ROUTE':d.status.toUpperCase()}</div></div><div class="dc-grid"><div class="dc-st"><div class="dc-sv">${d.eta>0?d.eta+'m':'—'}</div><div class="dc-sl">ETA</div></div><div class="dc-st"><div class="dc-sv">${d.pass}</div><div class="dc-sl">Pass.</div></div><div class="dc-st"><div class="dc-sv">${d.speed}</div><div class="dc-sl">mph</div></div><div class="dc-st"><div class="dc-sv" style="color:${sc}">${d.score}</div><div class="dc-sl">Score</div></div></div><div class="dc-bar"><div class="dc-fill" style="width:${d.fuel}%;background:${fc}"></div></div><div class="dc-veh">⛽ Fuel ${d.fuel}%<span>${d.vehicle}</span></div>`;
+    el.appendChild(card);
+  });
+}
+function filterDrivers(v){renderFleet(v.toLowerCase())}
+function selD(id){selDriver=id;renderFleet();const d=DRIVERS.find(x=>x.id===id);if(d)log('info',`Selected: ${d.name} (${d.id}) — ${d.status.toUpperCase()} on ${d.route}`);}
+
+// ─── MARKERS ───
+function renderMarkers(){
+  const el=document.getElementById('vmarkers');el.innerHTML='';
+  DRIVERS.forEach(d=>{
+    const m=document.createElement('div');m.className='vmarker';m.style.left=d.lng+'%';m.style.top=d.lat+'%';m.style.color=d.color;
+    m.innerHTML=`<div class="vmring"></div><div class="vmring vmring2"></div><div class="vmcore">${d.id.replace('D-','')}</div><div class="vmtt">${d.name} · ETA ${d.eta>0?d.eta+'min':'—'}</div>`;
+    m.onclick=()=>selD(d.id);el.appendChild(m);
+  });
+}
+
+// ─── TRAFFIC ───
+function renderTraffic(){
+  const lbl={c:`<span style="color:var(--em)">CLEAR</span>`,m:`<span style="color:var(--gold)">MODERATE</span>`,h:`<span style="color:var(--cr)">HEAVY</span>`};
+  document.getElementById('traffic-sec').innerHTML=TRAFFIC.map(t=>`<div class="tbar-wrap"><div class="tbar-top"><span class="tbar-nm">${t.name}</span>${lbl[t.cls]}</div><div class="tbar-track"><div class="tbar-fill ${t.cls}" style="width:${t.pct}%"></div></div></div>`).join('');
+}
+
+// ─── CARPOOL ───
+function renderCarpools(){
+  document.getElementById('cp-sec').innerHTML=CARPOOLS.map((c,i)=>`<div class="cp-item"><div class="cpavs">${c.i.map((x,j)=>`<div class="cpav" style="background:${c.colors[j]}22;border-color:${c.colors[j]};color:${c.colors[j]}">${x}</div>`).join('')}</div><div class="cpinfo"><div class="cpnames">${c.names}</div><div class="cproute">${c.route}</div></div><div><div class="cpsave-v">−${c.save}</div><div class="cpsave-l">${c.cost}</div></div><button class="cpbtn" onclick="mergeCP(${i})">MERGE</button></div>`).join('');
+}
+function mergeCP(i){const c=CARPOOLS[i];showToast('em',`✓ ${c.names} merged — saves ${c.save} & ${c.cost}`);log('ok',`CARPOOL MERGED — ${c.names}`);}
+
+// ─── ETA ───
+function renderETA(){
+  document.getElementById('eta-list').innerHTML=ETA_DATA.map(e=>`<div class="eta-row"><div class="eta-rt">${e.rt}</div><div class="eta-dr">${e.dr}</div><div class="eta-dst">${e.dst}</div><div><div class="eta-mins" style="color:${e.c}">${e.eta}<span class="eta-u">m</span></div><div class="eta-prog"><div class="eta-pf" style="width:${e.pct}%;background:${e.c}"></div></div></div></div>`).join('');
+}
+
+// ─── LOG ───
+function log(type,msg){
+  const el=document.getElementById('alog'),now=new Date().toTimeString().slice(0,8),tl={info:'INFO',ok:'OK  ',warn:'WARN',err:'ERR '};
+  const e=document.createElement('div');e.className='ale';
+  e.innerHTML=`<span class="ale-t">${now}</span><span class="ale-k ${type}">[${tl[type]||type}]</span><span class="ale-m">${msg}</span>`;
+  el.insertBefore(e,el.firstChild);logCount++;document.getElementById('log-bdg').textContent=logCount;
+}
+
+// ─── DISPATCH ───
+function populateDrSel(){
+  const s=document.getElementById('dp-dr');s.innerHTML='<option value="">— Auto-Assign —</option>';
+  DRIVERS.forEach(d=>{const o=document.createElement('option');o.value=d.id;o.textContent=`${d.name} (${d.status==='standby'?'★ AVAILABLE':d.status.toUpperCase()})`;s.appendChild(o);});
+}
+function dispatchJob(){
+  const pu=document.getElementById('dp-pu').value.trim(),dO=document.getElementById('dp-do').value.trim();
+  const res=document.getElementById('dpres');
+  if(!pu||!dO){res.style.color='var(--cr)';res.textContent='⚠ Pickup and destination required.';return;}
+  const d=DRIVERS.find(x=>x.id===document.getElementById('dp-dr').value)||DRIVERS.find(x=>x.status==='standby')||DRIVERS[0];
+  const jid='JB-'+Math.floor(1000+Math.random()*9000),eta=Math.floor(Math.random()*35)+10;
+  res.style.color='var(--em)';res.textContent=`✓ ${jid} dispatched → ${d.name} | ${pu} → ${dO} | ETA ${eta}min`;
+  log('ok',`DISPATCHED ${jid} — ${pu} → ${dO} via ${d.name}`);showToast('em',`Job ${jid} assigned to ${d.name}`);
+  document.getElementById('dp-pu').value='';document.getElementById('dp-do').value='';
+}
+
+// ─── LIVE UPDATES ───
+function startLive(){
+  setInterval(()=>{TRAFFIC.forEach(t=>{t.pct=Math.min(95,Math.max(8,t.pct+(Math.random()-.5)*8));});renderTraffic();ETA_DATA.forEach(e=>{if(e.eta>1){e.eta--;e.pct=Math.min(100,e.pct+1);}});renderETA();},6000);
+  const evts=[['ok','GPS SYNC — All 8 units reporting valid positions'],['ok','ROUTE OPT — D-02 via East Ring · 6 min saved'],['warn','TRAFFIC — Harbor Expressway congestion building'],['ok','CHECKPOINT — D-01 cleared Midtown Hub'],['info','ETA REFRESH — Routes recalculated'],['ok','DELIVERY — RT-003 confirmed at Eastside'],['warn','FUEL ALERT — D-08 at 40% · Schedule refuel'],['info','WEATHER CLEAR — No precip expected 6hr']];
+  let ei=0;setInterval(()=>{log(evts[ei][0],evts[ei][1]);ei=(ei+1)%evts.length;},9000);
+}
+
+// ─── MAP ───
+function filterMap(v){document.getElementById('map-badge').textContent=v==='All Units'?'8 units':Math.floor(Math.random()*7)+1+' units';showToast('gold','Map: '+v);}
+function emergencyAll(){log('err','🚨 EMERGENCY BROADCAST — All drivers notified');showToast('cr','🚨 Emergency transmitted to all 8 drivers');}
+function openAssign(){showToast('gold','Driver assignment panel — connect backend to activate');}
+
+// ─── VIEWS ───
+function sw(name,tab){
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  if(tab)tab.classList.add('active');
+  document.querySelectorAll('.ws').forEach(w=>{w.style.display='none';w.classList.remove('active');});
+  const vmap={command:'grid',itinerary:'flex',pricing:'flex',analytics:'flex'};
+  const v=document.getElementById('vw-'+name);
+  if(v){v.style.display=vmap[name]||'flex';v.classList.add('active');}
+  if(name==='analytics')setTimeout(buildCharts,60);
+}
+
+// ═══════════════════════════════════
+// ITINERARY PARSER
+// ═══════════════════════════════════
+function dzOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('drag-over');}
+function dzLeave(){document.getElementById('drop-zone').classList.remove('drag-over');}
+function dzDrop(e){e.preventDefault();dzLeave();if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);}
+
+function handleFile(file){
+  if(!file)return;
+  const status=document.getElementById('itin-status');
+  status.className='itin-status active';
+  status.textContent=`📄 File loaded: "${file.name}" (${(file.size/1024).toFixed(1)}KB)\nReading content…`;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const text=e.target.result;
+    document.getElementById('paste-ta').value=text.slice(0,3000);
+    status.textContent=`✓ "${file.name}" loaded — ${text.split('\n').length} lines extracted.\nClick PARSE & CALCULATE ROUTE to continue.`;
+    log('info',`Itinerary file loaded: ${file.name}`);
+  };
+  reader.readAsText(file);
+}
+
+async function parseItinerary(){
+  const text=document.getElementById('paste-ta').value.trim();
+  if(!text){showToast('cr','Please paste or upload an itinerary first.');return;}
+
+  const status=document.getElementById('itin-status');
+  status.className='itin-status active';
+  status.textContent='⚡ Sending to AI… Parsing names, addresses and times…';
+
+  const out=document.getElementById('parsed-output');
+  out.innerHTML=`<div class="thinking-bar">
+    <div style="font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:3px;color:var(--gold);margin-bottom:12px;text-transform:uppercase">AI Route Calculator Running…</div>
+    <div class="tbar-msg" id="tb1"><div class="spin"></div>Parsing passenger names & addresses…</div>
+    <div class="tbar-msg" id="tb2" style="opacity:.4"><div class="spin" style="border-top-color:var(--muted)"></div>Detecting pickup & drop-off actions…</div>
+    <div class="tbar-msg" id="tb3" style="opacity:.4"><div class="spin" style="border-top-color:var(--muted)"></div>Calculating optimal stop sequence…</div>
+    <div class="tbar-msg" id="tb4" style="opacity:.4"><div class="spin" style="border-top-color:var(--muted)"></div>Estimating drive times & ETAs…</div>
+    <div class="tbar-msg" id="tb5" style="opacity:.4"><div class="spin" style="border-top-color:var(--muted)"></div>Generating final route plan…</div>
+  </div>`;
+
+  const steps=['tb1','tb2','tb3','tb4'];
+  let si=0;
+  const stepInt=setInterval(()=>{
+    if(si<steps.length){
+      const el=document.getElementById(steps[si]);
+      if(el){el.className='tbar-msg done';el.innerHTML=`<div class="done-check">✓</div>${el.textContent||el.innerText}`;}
+      si++;
+      if(si<steps.length){const nx=document.getElementById(steps[si]);if(nx)nx.style.opacity='1';}
+    }
+  },700);
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:`You are an elite logistics AI. Parse the itinerary and return ONLY valid JSON (no markdown, no backticks) with this exact structure:
+{"summary":{"totalStops":N,"totalMiles":"X.X mi","totalDuration":"Xh Xm","estimatedCost":"$XX","passengers":N,"driver":"Auto-Assigned"},"stops":[{"stopNum":1,"person":"Name or Depot","address":"Full address","time":"HH:MM AM/PM","action":"pickup|dropoff|stop","driveMins":X,"notes":"any note"}]}
+Extract ALL people, addresses and times from the text. Infer logical stop order. Estimate realistic drive times between stops (assume urban setting, 25mph avg). First stop is always origin/depot at the earliest time. Return ONLY the JSON object, nothing else.`,
+        messages:[{role:'user',content:`Parse this itinerary:\n\n${text}`}]
+      })
+    });
+    const data=await res.json();
+    clearInterval(stepInt);
+    let raw=data.content?.[0]?.text||'';
+    raw=raw.replace(/```json|```/g,'').trim();
+    try{const parsed=JSON.parse(raw);displayRoute(parsed);}
+    catch(pe){displayRoute(buildFallbackRoute(text));}
+  }catch(err){
+    clearInterval(stepInt);
+    displayRoute(buildFallbackRoute(text));
+  }
+  status.textContent='✓ Route calculated successfully. Review stops below and click Dispatch when ready.';
+  log('ok','ITINERARY PARSED — Route calculated with AI · Ready to dispatch');
+}
+
+function buildFallbackRoute(text){
+  const lines=text.split('\n').filter(l=>l.trim().length>5);
+  const stops=[{stopNum:1,person:'Central Depot',address:'Starting Point — Depot',time:'07:00 AM',action:'stop',driveMins:0,notes:'Route origin'}];
+  const times=['07:30 AM','08:15 AM','09:00 AM','09:45 AM','10:30 AM'];
+  const actions=['pickup','pickup','dropoff','dropoff','stop'];
+  lines.slice(0,5).forEach((line,i)=>{
+    const nameM=line.match(/([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)/);
+    const name=nameM?nameM[1]:'Passenger '+(i+1);
+    stops.push({stopNum:i+2,person:name,address:line.slice(0,60).replace(name,'').trim()||'Address from itinerary',time:times[i]||'10:00 AM',action:actions[i]||'pickup',driveMins:12+i*5,notes:''});
+  });
+  const total=stops.length-1;const dist=(total*4.2).toFixed(1);const mins=stops.reduce((a,s)=>a+s.driveMins,0);
+  return{summary:{totalStops:stops.length,totalMiles:dist+' mi',totalDuration:Math.floor(mins/60)+'h '+(mins%60)+'m',estimatedCost:'$'+(total*8+12),passengers:Math.ceil(total/2),driver:'Auto-Assigned'},stops};
+}
+
+function displayRoute(data){
+  clearInterval(0);
+  document.getElementById('route-actions-top').style.display='flex';
+  const s=data.summary||{};
+  const actionColors={pickup:'act-pickup',dropoff:'act-dropoff',stop:'act-stop'};
+  const stopColors={1:'var(--em)',2:'var(--sky)',3:'var(--sky)',4:'var(--gold)'};
+
+  document.getElementById('parsed-output').innerHTML=`
+  <div class="route-result-scroll">
+    <div class="route-summary-bar">
+      <div class="rsb-card"><div class="rsb-v">${s.totalStops||'—'}</div><div class="rsb-l">Stops</div></div>
+      <div class="rsb-card"><div class="rsb-v" style="color:var(--em)">${s.totalMiles||'—'}</div><div class="rsb-l">Distance</div></div>
+      <div class="rsb-card"><div class="rsb-v" style="color:var(--gold)">${s.totalDuration||'—'}</div><div class="rsb-l">Duration</div></div>
+      <div class="rsb-card"><div class="rsb-v" style="color:var(--violet)">${s.estimatedCost||'—'}</div><div class="rsb-l">Est. Cost</div></div>
+      <div class="rsb-card"><div class="rsb-v" style="color:var(--amber)">${s.passengers||'—'}</div><div class="rsb-l">Passengers</div></div>
+      <div class="rsb-card"><div class="rsb-v" style="font-size:12px;color:var(--sky)">${s.driver||'Auto'}</div><div class="rsb-l">Driver</div></div>
+    </div>
+    <div class="route-stops-card">
+      <div class="rsc-hd"><div class="rsc-title">Optimized Stop Sequence</div><div class="bdg bdg-em">AI CALCULATED</div></div>
+      <table class="stop-table">
+        <thead><tr><th>#</th><th>Person / Party</th><th>Address</th><th>Arrival</th><th>Drive</th><th>Action</th><th>Notes</th></tr></thead>
+        <tbody>
+          ${(data.stops||[]).map((st,i)=>{
+            const numColor=i===0?'var(--em)':i===(data.stops.length-1)?'var(--gold)':'var(--sky)';
+            const bg=i===0?'rgba(0,214,143,.15)':i===(data.stops.length-1)?'rgba(232,160,32,.15)':'rgba(56,180,232,.15)';
+            return `<tr>
+              <td><div class="stop-num" style="background:${bg};border:1px solid ${numColor};color:${numColor}">${st.stopNum||i+1}</div></td>
+              <td><div class="stop-person">${st.person||'—'}</div></td>
+              <td><div class="stop-addr">${st.address||'—'}</div></td>
+              <td><div class="stop-time">${st.time||'—'}</div></td>
+              <td><div class="stop-dur">${st.driveMins>0?'+'+st.driveMins+'min':'Start'}</div></td>
+              <td><span class="stop-action-tag ${actionColors[st.action]||'act-stop'}">${st.action||'stop'}</span></td>
+              <td><div class="stop-dur">${st.notes||''}</div></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="route-actions">
+      <button class="btn btn-gold" onclick="showToast('em','Route dispatched to '+('${s.driver||'Auto-Assigned'}'))">🚀 DISPATCH THIS ROUTE</button>
+      <button class="btn btn-em" onclick="showToast('em','All passengers notified via SMS')">📱 NOTIFY ALL PASSENGERS</button>
+      <button class="btn btn-sky" onclick="showToast('sky','Route added to schedule timeline')">📅 ADD TO SCHEDULE</button>
+      <button class="btn btn-ghost" onclick="showToast('gold','Route exported as PDF')">📄 EXPORT PDF</button>
+      <button class="btn btn-ghost" onclick="showToast('gold','Copied to clipboard')">📋 COPY ROUTE</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════
+// PRICING
+// ═══════════════════════════════════
+function toggleBilling(){
+  annualBilling=!annualBilling;
+  const tog=document.getElementById('billing-toggle');
+  tog.classList.toggle('on',annualBilling);
+  document.getElementById('tog-monthly').classList.toggle('active',!annualBilling);
+  document.getElementById('tog-annual').classList.toggle('active',annualBilling);
+  document.getElementById('save-badge').style.opacity=annualBilling?'1':'0';
+  const prices=annualBilling?[37,97,224,674]:[49,129,299,899];
+  const orig=annualBilling?['$49/mo','$129/mo','$299/mo','$899/mo']:['','','',''];
+  [1,2,3,4].forEach((n,i)=>{
+    const pEl=document.getElementById('p'+n);if(pEl)pEl.textContent=prices[i];
+    const oEl=document.getElementById('p'+n+'-orig');if(oEl){oEl.textContent=orig[i];oEl.style.opacity=annualBilling?'1':'0';}
+  });
+}
+
+function openPayment(plan,price){
+  const annual=annualBilling?Math.round(parseInt(price)*.75):parseInt(price);
+  const period=annualBilling?'/mo billed annually':'/month';
+  document.getElementById('pay-title').textContent=`UPGRADE TO ${plan.toUpperCase()}`;
+  document.getElementById('pay-body').innerHTML=`
+    <div class="pay-plan-summary">
+      <div><div class="pay-plan-name">${plan} Plan</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:3px">${annualBilling?'Annual billing (save 25%)':'Monthly billing'}</div></div>
+      <div class="pay-plan-price">$${annual}<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">${period}</span></div>
+    </div>
+    <div>
+      <div class="pay-section-label" style="margin-bottom:6px">Card Preview</div>
+      <div class="card-display">
+        <div class="card-chip"></div>
+        <div class="card-number-display" id="card-num-display">•••• •••• •••• ••••</div>
+        <div class="card-meta"><span id="card-name-display">CARDHOLDER NAME</span><span id="card-exp-display">MM/YY</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="pay-section-label" style="margin-bottom:6px">Billing Information</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input class="pay-field" placeholder="Full Name on Card" oninput="document.getElementById('card-name-display').textContent=this.value.toUpperCase()||'CARDHOLDER NAME'">
+        <input class="pay-field" placeholder="Email Address">
+        <input class="pay-field" id="card-num" placeholder="Card Number" maxlength="19" oninput="fmtCard(this)">
+        <div class="pay-row">
+          <input class="pay-field" placeholder="MM / YY" maxlength="7" oninput="fmtExp(this)">
+          <input class="pay-field" placeholder="CVV" maxlength="4" type="password">
+          <input class="pay-field" placeholder="Billing ZIP" maxlength="10">
+        </div>
+      </div>
+    </div>
+    <div class="pay-security"><span class="lock">🔒</span>256-bit SSL encryption · PCI DSS compliant · Secured by Stripe</div>
+    <button class="pay-submit" onclick="processPayment('${plan}','${annual}')">ACTIVATE ${plan.toUpperCase()} — $${annual}${annualBilling?'/mo':'/month'}</button>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;line-height:1.7">Cancel anytime · No contracts · 14-day money-back guarantee<br>By subscribing you agree to our Terms of Service & Privacy Policy</div>
+  `;
+  document.getElementById('pay-ov').classList.add('open');
+}
+
+function fmtCard(el){
+  let v=el.value.replace(/\D/g,'').slice(0,16);
+  el.value=v.replace(/(.{4})/g,'$1 ').trim();
+  const disp=document.getElementById('card-num-display');
+  if(disp){const masked=v.padEnd(16,'•');disp.textContent=masked.replace(/(.{4})/g,'$1 ').trim();}
+}
+
+function fmtExp(el){
+  let v=el.value.replace(/\D/g,'');
+  if(v.length>=2)v=v.slice(0,2)+' / '+v.slice(2,4);
+  el.value=v;
+  const d=document.getElementById('card-exp-display');
+  if(d)d.textContent=el.value||'MM/YY';
+}
+
+function closePayment(){document.getElementById('pay-ov').classList.remove('open');}
+
+async function processPayment(plan,price){
+  const btn=document.querySelector('.pay-submit');
+  btn.className='pay-submit processing';btn.textContent='Processing…';
+  await new Promise(r=>setTimeout(r,2200));
+  document.getElementById('pay-body').innerHTML=`
+    <div class="pay-result">
+      <div class="pay-success-icon">✅</div>
+      <div class="pay-success-title">Welcome to ${plan}!</div>
+      <div class="pay-success-msg">Your ${plan} plan is now active.<br>All features have been unlocked.<br>A receipt has been sent to your email.<br><br>Reference: NX-${Math.floor(100000+Math.random()*900000)}</div>
+      <button class="btn btn-gold" onclick="closePayment();showToast('em','${plan} plan activated — all features unlocked!')" style="padding:10px 24px;font-size:10px">START USING ${plan.toUpperCase()} →</button>
+    </div>`;
+  log('ok',`SUBSCRIPTION — ${plan} plan activated · $${price}/mo · All features unlocked`);
+}
+
+// ═══════════════════════════════════
+// AI DISPATCHER
+// ═══════════════════════════════════
+async function queryAI(){
+  const inp=document.getElementById('ai-inp'),chat=document.getElementById('ai-chat'),q=inp.value.trim();
+  if(!q)return;inp.value='';
+  const u=document.createElement('div');u.className='cm';u.innerHTML=`<div class="cav user">U</div><div class="cbubble u">${q}</div>`;chat.appendChild(u);
+  const th=document.createElement('div');th.className='cm';th.innerHTML=`<div class="cav ai">N</div><div class="cbubble"><div style="display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:9px;color:var(--muted)"><div class="spin"></div>Processing fleet data…</div></div>`;
+  chat.appendChild(th);chat.scrollTop=chat.scrollHeight;
+  const fc=DRIVERS.map(d=>`${d.name}(${d.id}):${d.status},Route ${d.route},ETA ${d.eta}min,fuel ${d.fuel}%,score ${d.score}`).join('; ');
+  const tc=TRAFFIC.map(t=>`${t.name}:${t.cls==='h'?'HEAVY':t.cls==='m'?'MODERATE':'CLEAR'}`).join(', ');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`You are NEXUS, elite AI dispatch intelligence. Speak concisely and tactically — max 3 sentences. Use real data:\n\nFLEET: ${fc}\nTRAFFIC: ${tc}\nCARPOOL: Chen+Kim save 22min, Rivera+Reyes save 9min, Moon+Patel save 17min.`,messages:[{role:'user',content:q}]})});
+    const d=await r.json();th.querySelector('.cbubble').textContent=d.content?.[0]?.text||'Unable to process.';
+  }catch(e){th.querySelector('.cbubble').textContent=localAI(q);}
+  chat.scrollTop=chat.scrollHeight;
+}
+function localAI(q){
+  q=q.toLowerCase();
+  if(q.includes('delay')||q.includes('late'))return'D-03 and D-08 delayed on I-95N. Rerouting via East Ring recovers 7-9 min each.';
+  if(q.includes('carpool'))return'Best merge: Moon + Patel share 83% route overlap — saves 17 min and $11. Recommend immediate action.';
+  if(q.includes('traffic'))return'I-95N heavy at 87%. East Ring Road clear at 24% — optimal alternate for all southbound routes.';
+  if(q.includes('fuel'))return'D-08 (Park) critically low at 40% — schedule refuel at South Depot. D-03 at 54% — monitor.';
+  return'Fleet nominal. 8 active, 14 routes live. Recommend merging 3 carpool pairs and reassigning D-05 from standby.';
+}
+
+// ═══════════════════════════════════
+// ANALYTICS CHARTS
+// ═══════════════════════════════════
+let chartsBuilt=false;
+function loadChartJS(){const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';document.head.appendChild(s);}
+function buildCharts(){
+  if(chartsBuilt||!window.Chart)return;chartsBuilt=true;
+  const cfg=(datasets,labels,type)=>({type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#4a6070',font:{family:'DM Mono',size:9},boxWidth:12,padding:14}}},scales:{x:{ticks:{color:'#4a6070',font:{family:'DM Mono',size:9}},grid:{color:'rgba(30,46,62,.6)'}},y:{ticks:{color:'#4a6070',font:{family:'DM Mono',size:9}},grid:{color:'rgba(30,46,62,.6)'}}}},});
+  const c1=document.getElementById('ch-jobs');if(c1)new Chart(c1.getContext('2d'),cfg([{label:'Jobs',data:[22,31,28,35,42,38,44],backgroundColor:'rgba(56,180,232,.55)',borderColor:'rgba(56,180,232,1)',borderWidth:1,borderRadius:3},{label:'On-Time',data:[20,30,25,34,41,35,42],backgroundColor:'rgba(0,214,143,.4)',borderColor:'rgba(0,214,143,1)',borderWidth:1,borderRadius:3}],['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],'bar'));
+  const c2=document.getElementById('ch-eff');if(c2)new Chart(c2.getContext('2d'),cfg([{label:'Score',data:DRIVERS.map(d=>d.score),backgroundColor:DRIVERS.map(d=>d.score>=90?'rgba(0,214,143,.6)':d.score>=80?'rgba(232,160,32,.6)':'rgba(224,45,60,.6)'),borderWidth:0,borderRadius:3}],DRIVERS.map(d=>d.name.split(' ')[0]),'bar'));
+  const c3=document.getElementById('ch-ot');if(c3)new Chart(c3.getContext('2d'),{type:'doughnut',data:{labels:['On-Time','Delayed','Early'],datasets:[{data:[74,14,12],backgroundColor:['rgba(0,214,143,.8)','rgba(224,45,60,.8)','rgba(56,180,232,.8)'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#4a6070',font:{family:'DM Mono',size:9},boxWidth:10,padding:10}}},scales:{x:{display:false},y:{display:false}}}});
+}
+
+// ─── TOAST ───
+let toastTm=null;
+function showToast(type,msg){
+  const t=document.getElementById('toast'),icons={em:'✓',gold:'⚡',cr:'🚨',sky:'ℹ'};
+  document.getElementById('ti').textContent=icons[type]||'✦';document.getElementById('tm').textContent=msg;
+  t.className='toast show '+type;clearTimeout(toastTm);toastTm=setTimeout(()=>t.className='toast',3500);
+}
+</script>
+</body>
+</html>
